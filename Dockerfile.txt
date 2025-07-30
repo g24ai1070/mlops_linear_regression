@@ -1,21 +1,21 @@
-# Use Python 3.9 slim image
+# Start from lightweight Python 3.9 image
 FROM python:3.9-slim
 
-# Set working directory
+# Define the application directory
 WORKDIR /app
 
-# Copy requirements first for better caching
-COPY requirements.txt .
+# Add dependency file separately to leverage Docker cache
+COPY requirements.txt /app/
 
-# Install dependencies
+# Install required Python packages
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy source code
-COPY src/ ./src/
-COPY models/ ./models/
+# Add application source and model files
+COPY ./src /app/src
+COPY ./models /app/models
 
-# Set Python path
-ENV PYTHONPATH=/app/src
+# Set environment variable for Python module path
+ENV PYTHONPATH="/app/src"
 
-# Default command to run predict.py
-CMD ["python", "src/predict.py"]
+# Set default command to execute prediction script
+ENTRYPOINT ["python", "src/predict.py"]

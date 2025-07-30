@@ -1,36 +1,38 @@
 import numpy as np
 from utils import (
-    load_dataset, create_model, save_model,
+    load_dataset,
+    create_model,
+    save_model,
     calculate_metrics
 )
 
 
 def main():
-    """Main training function."""
-    print("Loading California Housing dataset...")
+    """Main function for training the linear regression model."""
+    print("Loading dataset...")
     X_train, X_test, y_train, y_test = load_dataset()
 
-    print("Creating LinearRegression model...")
+    print("Creating model...")
     model = create_model()
 
     print("Training model...")
     model.fit(X_train, y_train)
 
-    # Make predictions
+    print("Generating predictions...")
     y_pred = model.predict(X_test)
 
-    # Calculate metrics
-    r2, mse = calculate_metrics(y_test, y_pred)
+    print("Calculating evaluation metrics...")
+    r2_score, mse = calculate_metrics(y_test, y_pred)
 
-    print(f"R² Score: {r2:.4f}")
-    print(f"Mean Squared Error (Loss): {mse:.4f}")
+    print(f"R² Score: {r2_score:.4f}")
+    print(f"Mean Squared Error: {mse:.4f}")
 
-    # Save model
+    print("Saving trained model...")
     model_path = "models/linear_regression_model.joblib"
     save_model(model, model_path)
-    print(f"Model saved to {model_path}")
+    print(f"Model successfully saved to: {model_path}")
 
-    return model, r2, mse
+    return model, r2_score, mse
 
 
 if __name__ == "__main__":

@@ -1,32 +1,53 @@
 import numpy as np
+import os
 from utils import load_model, load_dataset, calculate_metrics
 
 
+def display_predictions(y_true, y_pred, num=10):
+    print("\n Sample Predictions (first 10):")
+    print("-" * 50)
+    print(f"{'True':>10} | {'Predicted':>10} | {'Abs Diff':>10}")
+    print("-" * 50)
+    for i in range(min(num, len(y_true))):
+        true_val = y_true[i]
+        pred_val = y_pred[i]
+        diff = abs(true_val - pred_val)
+        print(f"{true_val:10.2f} | {pred_val:10.2f} | {diff:10.2f}")
+    print("-" * 50)
+
+
 def main():
-    """Main prediction function for Docker container."""
-    print("Loading trained model...")
-    model = load_model("models/linear_regression_model.joblib")
+    """Main prediction function for Docker container or local run."""
 
-    print("Loading test dataset...")
-    X_train, X_test, y_train, y_test = load_dataset()
+    model_path = "models/linear_regression_model.joblib"
 
-    print("Making predictions...")
+    if not os.path.exists(model_path):
+        print(f" Model file not found at: {model_path}")
+        return False
+
+    print(" Loading trained model...")
+    model = load_model(model_path)
+
+    print(" Loading test dataset...")
+    _, X_test, _, y_test = load_dataset()
+
+    print(" Making predictions...")
     y_pred = model.predict(X_test)
 
-    # Calculate metrics
+    print(" Calculating performance metrics...")
     r2, mse = calculate_metrics(y_test, y_pred)
 
-    print(f"Model Performance:")
+    print("\n Model Performance:")
     print(f"R² Score: {r2:.4f}")
     print(f"Mean Squared Error: {mse:.4f}")
 
-    print("\nSample Predictions (first 10):")
-    for i in range(10):
-        print(f"True: {y_test[i]:.2f} | Predicted: {y_pred[i]:.2f} | Diff: {abs(y_test[i] - y_pred[i]):.2f}")
+    display_predictions(y_test, y_pred)
 
-    print("\nPrediction completed successfully!")
+    print("\n Prediction completed successfully!")
     return True
 
 
 if __name__ == "__main__":
-    main()
+    success = main()
+    if not success:
+        exit(1)
